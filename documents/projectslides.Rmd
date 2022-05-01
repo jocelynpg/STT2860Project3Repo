@@ -1,0 +1,98 @@
+---
+title: "Final Presentation"
+author: "Author: Jocelyn Pelcastre-Gonzalez"
+date: "`r format(Sys.time(), '%B %d, %Y @ %I:%M %p')`"
+output: ioslides_presentation
+---
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  comment = NA
+)
+```
+
+## Packages Used
+
+I used tidyverse for data manipulation and plotting.
+
+```{r, echo = TRUE}
+library(tidyverse)
+```
+
+I used dplyr to manipulate my data. 
+
+```{r, echo = TRUE}
+library(dplyr)
+```
+
+
+I used RColorBrewer for the plot colors. 
+
+```{r, echo = TRUE}
+library(RColorBrewer)
+```
+
+
+## Energy Consumption Data
+
+I obtained my dataset from Kaggle from the user Lobo Si on the [Countries CO2 Emission and More](https://www.kaggle.com/datasets/lobosi/c02-emission-by-countrys-grouth-and-population). 
+
+The dataset was last updated two months ago and only accounts for the energy consumption up to 2019, so some of the values may be different.  
+
+**Variables in the Dataset:**
+
+* `Country`: Country in question
+* `Energy_type`: Type of energy source
+* `Year`: Year the data was recorded
+* `Energy_consumption`: Amount of Consumption for the specific energy source, measured (quad Btu)
+* `Energy_production`: Amount of Production for the specific energy source, measured (quad Btu)
+
+##
+
+* `GDP`: Countries GDP at purchasing power parities, measured (Billion 2015$ PPP)
+* `Population`: Population of specific Country, measured (Mperson)
+* `Energyintensityper_capita`: Energy intensity is a measure of the energy inefficiency of an economy. It is calculated as units of energy per unit of capita (capita = individual person), measured (MMBtu/person)
+* `Energyintensityby_GDP`: Energy intensity is a measure of the energy inefficiency of an economy. It is calculated as units of energy per unit of GDP, measred (1000 Btu/2015$ GDP PPP)
+* `CO2_emission`: The amount of C02 emitted, measured (MMtonnes CO2)
+
+```{r}
+data <- read_csv("~/git_repositories/STT2860Project3Repo/data/energy.csv")
+```
+
+##
+
+```{r, fig.align = "center", fig.width = 7.5}
+data %>%
+  filter(Year == 2019, Country != 'World', Energy_type == 'all_energy_types', Energy_intensity_per_capita != '0') %>%
+  ggplot(aes(x = Energy_intensity_per_capita)) + 
+  geom_histogram(binwidth = 15, fill = "Sky Blue") +
+  theme_minimal() +
+  labs(title = "Energy Intensity Per Capita of Countries in 2019",
+       y = "Number of Countries",
+       x = "Energy Intensity Per Capita (MMBtu/person)",
+       caption = "The Worldwide Energy Per Capita was around 78 MMBtu/person for 2019")
+  
+  
+```
+
+Most countries have their ranges of Energy Intensity per Capita around 0 and 190 MMBtu/Person, however, we have some big outliers present. The biggest outlier is Qatar.
+
+##
+
+```{r, fig.align = "center", fig.width = 9}
+data %>%
+  filter(Country == 'World', Energy_type != 'all_energy_types') %>%
+  ggplot(aes(x = Year, y = Energy_consumption, fill = Energy_type)) +
+  geom_col() + 
+  labs(title = "Worldwide Energy Consumption from 1980 to 2019",
+       x = "Year",
+       y = "Energy Consumption (quad Btu)") +
+  scale_fill_brewer(palette = "Paired", name = "Energy Type", labels = c("Coal", "Natural Gas", "Nuclear", "Petroleum and Other Liquids", "Renewables and Other")) +
+  scale_x_continuous(breaks = seq(1980, 2019, by = 5)) +
+  theme_minimal()
+```
+
+We can see how all of the energy consumption for each energy type has generally increased throughtout the years. However, Renewable energy appears to have the most stable growth than the other energy types and the use of coal has been increasing greatly since 1980.
